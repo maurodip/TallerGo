@@ -11,3 +11,8 @@ func PublishTweet(aTweet string) {
 func GetTweet() string {
 	return tweet
 }
+
+//ClearTweet clear tweet
+func ClearTweet() {
+	tweet = ""
+}
