@@ -3,27 +3,46 @@ package service_test
 import (
 	"testing"
 
+	"github.com/TallerGo/src/domain"
 	"github.com/TallerGo/src/service"
 )
 
 func TestPublishedTweetIsSaved(t *testing.T) {
 
-	tweet := "This is my fisrt tweet"
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
 
 	service.PublishTweet(tweet)
 
-	if service.GetTweet() != tweet {
-		t.Error("Expected tweet is: ", tweet)
+	publishedTweet := service.GetTweet()
+
+	if publishedTweet.User != user &&
+		publishedTweet.Text != text {
+		t.Errorf("Expected tweet is %s: %s \nbut is %s: %s",
+			user, text, publishedTweet.User, publishedTweet.Text)
+	}
+
+	if publishedTweet.Date == nil {
+		t.Error("Expected date cannot be nil")
 	}
 }
 func TestCleanedTweetIsClean(t *testing.T) {
 
-	tweet := "This is my fisrt tweet"
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
 
 	service.PublishTweet(tweet)
 	service.ClearTweet()
 
-	if service.GetTweet() != "" {
+	if service.GetTweet() != nil {
 		t.Error("Expected empty tweet")
 	}
 }

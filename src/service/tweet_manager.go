@@ -1,18 +1,22 @@
 package service
 
-var tweet string
+import (
+	"github.com/TallerGo/src/domain"
+)
+
+var tweet *domain.Tweet
 
 //PublishTweet publish a tweet
-func PublishTweet(aTweet string) {
+func PublishTweet(aTweet *domain.Tweet) {
 	tweet = aTweet
 }
 
 //GetTweet return the tweet
-func GetTweet() string {
+func GetTweet() *domain.Tweet {
 	return tweet
 }
 
-//ClearTweet clear tweet
+//ClearTweet clear a tweet
 func ClearTweet() {
-	tweet = ""
+	tweet = nil
 }
