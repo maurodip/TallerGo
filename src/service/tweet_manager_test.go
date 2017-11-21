@@ -8,11 +8,11 @@ import (
 
 func TestPublishedTweetIsSaved(t *testing.T) {
 
-	var tweet string = "This is my fisrt tweet"
+	tweet := "This is my fisrt tweet"
 
 	service.PublishTweet(tweet)
 
-	if service.Tweet != tweet {
+	if service.GetTweet() != tweet {
 		t.Error("Expected tweet is: ", tweet)
 	}
 }
