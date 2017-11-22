@@ -86,8 +86,11 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 	var tweet *domain.Tweet
 	user := "grupoesfera"
-	text := "1234567890123456789012345678901234567890123456789012345678901234567890"
-	text = text + "12345678901234567890123456789012345678901234567890123456789012345678901"
+
+	text := `Whether you use Waterfall, Agile, or Conversational Development, GitLab streamlines your collaborative workflows. 
+	Visualize, prioritize, coordinate, and track your progress your way with GitLab’s flexible project management tools. 
+	Spend less time configuring your tools, and more time creating. Whether you’re deploying to one server or thousands, 
+	build, test, and release your code confidently and securely with GitLab’s built-in continuous delivery and deployment.`
 
 	tweet = domain.NewTweet(user, text)
 
