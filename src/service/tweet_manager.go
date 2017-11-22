@@ -10,13 +10,11 @@ var tweet *domain.Tweet
 
 //PublishTweet publish a tweet
 func PublishTweet(aTweet *domain.Tweet) error {
-	var err error
-	if aTweet.User != "" {
-		tweet = aTweet
-	} else {
-		err = fmt.Errorf("user is required")
+	if aTweet.User == "" {
+		return fmt.Errorf("user is required")
 	}
-	return err
+	tweet = aTweet
+	return nil
 }
 
 //GetTweet return the tweet
