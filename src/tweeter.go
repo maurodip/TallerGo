@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/TallerGo/src/domain"
 	"github.com/TallerGo/src/service"
 	"github.com/abiosoft/ishell"
 )
@@ -17,9 +18,16 @@ func main() {
 		Func: func(c *ishell.Context) {
 			defer c.ShowPrompt(true)
 
+			c.Print("Write your User: ")
+
+			user := c.ReadLine()
+
 			c.Print("Write your tweet: ")
 
-			tweet := c.ReadLine()
+			text := c.ReadLine()
+
+			var tweet *domain.Tweet
+			tweet = domain.NewTweet(user, text)
 
 			service.PublishTweet(tweet)
 
@@ -37,8 +45,11 @@ func main() {
 
 			tweet := service.GetTweet()
 
-			c.Println(tweet)
-
+			if tweet != nil {
+				c.Println(tweet.Text)
+			} else {
+				c.Println("Don't have tweet to show")
+			}
 			return
 		},
 	})
