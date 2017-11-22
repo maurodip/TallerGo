@@ -5,6 +5,7 @@ import (
 )
 
 type Tweet struct {
+	Id   int
 	User string
 	Text string
 	Date *time.Time
