@@ -142,7 +142,6 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 	if !isValidTweet(t, secondPublishedTweet, idSecond, user, secondText) {
 		return
 	}
-
 }
 
 func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) bool {
@@ -159,7 +158,6 @@ func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) 
 	}
 
 	return true
-
 }
 
 func TestCleanedTweetIsClean(t *testing.T) {
@@ -199,4 +197,34 @@ func TestCanRetrieveTweetById(t *testing.T) {
 	publishedTweet := service.GetTweetById(id)
 
 	isValidTweet(t, publishedTweet, id, user, text)
+}
+
+func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
+
+	// Initialization
+	service.InitializeService()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	service.PublishTweet(tweet)
+	service.PublishTweet(secondTweet)
+	service.PublishTweet(thirdTweet)
+
+	// Operation
+	count := service.CountTweetsByUser(user)
+
+	// Validation
+	if count != 2 {
+		t.Errorf("Expected count is 2 but was %d", count)
+	}
+
 }
