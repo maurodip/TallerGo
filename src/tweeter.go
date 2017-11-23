@@ -58,6 +58,22 @@ func main() {
 	})
 
 	shell.AddCmd(&ishell.Cmd{
+		Name: "countTweets",
+		Help: "Shows a tweet",
+		Func: func(c *ishell.Context) {
+			defer c.ShowPrompt(true)
+
+			c.Print("Write User to count: ")
+
+			user := c.ReadLine()
+			count := service.CountTweetsByUser(user)
+
+			c.Println(count)
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
 		Name: "clearTweet",
 		Help: "Clean a tweet",
 		Func: func(c *ishell.Context) {
