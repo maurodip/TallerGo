@@ -271,6 +271,50 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 
 }
 
+func TestUserCanFollowUsers(t *testing.T) {
+	service.InitializeService()
+	user := "nportas"
+	anotherUser := "mercadolibre"
+	text := "This is my first tweet portas"
+	secondText := "This is my second tweet meli"
+
+	tweet := domain.NewTweet(user, text)
+	secondTweet := domain.NewTweet(anotherUser, secondText)
+
+	firstId, _ := service.PublishTweet(tweet)
+	secondId, _ := service.PublishTweet(secondTweet)
+
+	grupoesferaTweet := domain.NewTweet("grupoesfera", text)
+	thirdId, _ := service.PublishTweet(grupoesferaTweet)
+
+	service.Follow("grupoesfera", user)
+	service.Follow("grupoesfera", anotherUser)
+
+	timeline := service.GetTimeline("grupoesfera")
+
+	println(timeline)
+	if len(timeline) != 3 {
+		t.Errorf("Error expected is user not exist")
+		return
+	}
+
+	firstPublishedTweet := timeline[0]
+	secondPublishedTweet := timeline[1]
+	thirdPublishedTweet := timeline[2]
+
+	if !isValidTweet(t, firstPublishedTweet, firstId, user, text) {
+		return
+	}
+
+	if !isValidTweet(t, secondPublishedTweet, secondId, anotherUser, secondText) {
+		return
+	}
+
+	if !isValidTweet(t, thirdPublishedTweet, thirdId, "grupoesfera", text) {
+		return
+	}
+}
+
 func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) bool {
 
 	if tweet.Id != id {
