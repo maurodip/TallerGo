@@ -7,6 +7,7 @@ import (
 )
 
 var tweets []*domain.Tweet
+var tweetsByUser map[string][]*domain.Tweet
 
 //PublishTweet publish a tweet
 func PublishTweet(tweet *domain.Tweet) (int, error) {
@@ -19,6 +20,17 @@ func PublishTweet(tweet *domain.Tweet) (int, error) {
 	if len(tweet.Text) > 140 {
 		return 0, fmt.Errorf("text exceeds 140 characters")
 	}
+
+	_, ok := tweetsByUser[tweet.User]
+
+	if !ok {
+		tweetsByUser[tweet.User] = make([]*domain.Tweet, 0)
+	}
+
+	listByUser := tweetsByUser[tweet.User]
+	listByUser = append(listByUser, tweet)
+	tweetsByUser[tweet.User] = listByUser
+
 	tweet.Id = len(tweets) + 1
 	tweets = append(tweets, tweet)
 	return tweet.Id, nil
@@ -35,11 +47,13 @@ func GetTweet() *domain.Tweet {
 //ClearTweet clear a tweet
 func ClearTweet() {
 	tweets = tweets[:0]
+	tweetsByUser = make(map[string][]*domain.Tweet)
 }
 
 //InitializeService initial service
 func InitializeService() {
 	tweets = make([]*domain.Tweet, 0)
+	tweetsByUser = make(map[string][]*domain.Tweet)
 }
 
 //GetTweets return the tweets
@@ -52,22 +66,18 @@ func GetTweetById(id int) *domain.Tweet {
 	return tweets[id-1]
 }
 
-func CountTweetsByUser(user string) int {
-	count := 0
-	for _, tweet := range tweets {
-		if tweet.User == user {
-			count++
-		}
+func CountTweetsByUser(user string) (int, error) {
+	list, ok := tweetsByUser[user]
+	if !ok {
+		return 0, fmt.Errorf("user not exist")
 	}
-	return count
+	return len(list), nil
 }
 
-func GetTweetsByUser(user string) []*domain.Tweet {
-	listOfTweets := make([]*domain.Tweet, 0)
-	for _, tweet := range tweets {
-		if tweet.User == user {
-			listOfTweets = append(listOfTweets, tweet)
-		}
+func GetTweetsByUser(user string) ([]*domain.Tweet, error) {
+	list, ok := tweetsByUser[user]
+	if !ok {
+		return nil, fmt.Errorf("user not exist")
 	}
-	return listOfTweets
+	return list, nil
 }

@@ -188,11 +188,42 @@ func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 	service.PublishTweet(thirdTweet)
 
 	// Operation
-	count := service.CountTweetsByUser(user)
+	count, _ := service.CountTweetsByUser(user)
 
 	// Validation
 	if count != 2 {
 		t.Errorf("Expected count is 2 but was %d", count)
+	}
+
+}
+
+func TestCannotCountTheTweetsSentByAnUserNotExist(t *testing.T) {
+
+	// Initialization
+	service.InitializeService()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	service.PublishTweet(tweet)
+	service.PublishTweet(secondTweet)
+	service.PublishTweet(thirdTweet)
+
+	// Operation
+	_, err := service.CountTweetsByUser("montoto")
+
+	// Validation
+	if err == nil && err.Error() == "user not exist" {
+		t.Errorf("Error expected is user not exist")
+		return
 	}
 
 }
@@ -218,7 +249,7 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 	service.PublishTweet(thirdTweet)
 
 	// Operation
-	tweets := service.GetTweetsByUser(user)
+	tweets, _ := service.GetTweetsByUser(user)
 
 	// Validation
 	if len(tweets) != 2 {
@@ -258,5 +289,23 @@ func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) 
 	}
 
 	return true
+
+}
+
+func TestCannotRetrieveTheTweetsSentByAnUserNotExisting(t *testing.T) {
+
+	// Initialization
+	service.InitializeService()
+	user := "grupoesfera"
+
+	// Operation
+	_, err := service.GetTweetsByUser(user)
+
+	// Validation
+	if err == nil && err.Error() == "user not exist" {
+
+		t.Errorf("Error expected is user not exist")
+		return
+	}
 
 }
