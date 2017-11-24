@@ -240,6 +240,121 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 
 }
 
+func TestUserCanSendDirectMessages(t *testing.T) {
+
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	tweetManager.PublishTweet(tweet)
+	tweetManager.PublishTweet(secondTweet)
+	tweetManager.PublishTweet(thirdTweet)
+
+	// Operation
+	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
+
+	// Validation
+	unreadDMs := tweetManager.GetUnreadedDirectMessages(anotherUser)
+	if len(unreadDMs) != 1 {
+		t.Errorf("Expected size is 1 but was %d", len(unreadDMs))
+		return
+	}
+
+	if unreadDMs[0].Text != "Hola "+anotherUser {
+		t.Errorf("Expected message is "+"Hola "+anotherUser+" but was %d", unreadDMs[0].Text)
+		return
+	}
+
+}
+
+func TestUserCanObtainDirectMessages(t *testing.T) {
+
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	tweetManager.PublishTweet(tweet)
+	tweetManager.PublishTweet(secondTweet)
+	tweetManager.PublishTweet(thirdTweet)
+
+	// Operation
+	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
+	DMs := tweetManager.GetAllDirectMessages(anotherUser)
+
+	// Validation
+	if len(DMs) != 1 {
+		t.Errorf("Expected size is 1 but was %d", len(DMs))
+		return
+	}
+
+	if DMs[0].Text != "Hola "+anotherUser {
+		t.Errorf("Expected message is "+"Hola "+anotherUser+" but was %d", DMs[0].Text)
+		return
+	}
+
+}
+
+func TestUserCanReadMessage(t *testing.T) {
+
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	tweetManager.PublishTweet(tweet)
+	tweetManager.PublishTweet(secondTweet)
+	tweetManager.PublishTweet(thirdTweet)
+
+	// Operation
+	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
+	tweetManager.SendDirectMessage(user, anotherUser, "Hola 2 "+anotherUser)
+	DMs := tweetManager.GetAllDirectMessages(anotherUser)
+
+	// Validation
+	if len(tweetManager.GetUnreadedDirectMessages(anotherUser)) != 2 {
+		t.Errorf("Expected size is 2 but was %d", len(tweetManager.GetUnreadedDirectMessages(anotherUser)))
+		return
+	}
+
+	tweetManager.ReadDirectMessage(DMs[0].Id)
+
+	// Validation
+	if len(tweetManager.GetUnreadedDirectMessages(anotherUser)) != 1 {
+		t.Errorf("Expected size is 1 but was %d", len(tweetManager.GetUnreadedDirectMessages(anotherUser)))
+		return
+	}
+
+}
+
 func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) bool {
 
 	if tweet.Id != id {
@@ -305,6 +420,31 @@ func TestCannotCountTheTweetsSentByAnUserNotExist(t *testing.T) {
 	// Validation
 	if err == nil && err.Error() == "user not exist" {
 		t.Errorf("Error expected is user not exist")
+		return
+	}
+
+}
+
+func TestCanRetrieveTTs(t *testing.T) {
+
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	text := "HOLA HOLA HOLA HOLA Manola Chau Chau"
+	tweet = domain.NewTweet(user, text)
+
+	tweetManager.PublishTweet(tweet)
+
+	// Operation
+	tts := tweetManager.GetTrendingTopics()
+
+	// Validation
+	if tts[0] != "HOLA" || tts[1] != "Chau" {
+		t.Errorf("Error expected tts HOLA Chau")
+
 		return
 	}
 
