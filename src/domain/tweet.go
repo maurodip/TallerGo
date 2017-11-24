@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -29,5 +30,5 @@ func (tweet Tweet) Favear() {
 }
 
 func (tweet Tweet) PrintableTweet() string {
-	return "@" + tweet.User + ": " + tweet.Text
+	return fmt.Sprintf("@%s: %s", tweet.User, tweet.Text)
 }
