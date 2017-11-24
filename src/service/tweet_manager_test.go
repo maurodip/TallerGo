@@ -12,12 +12,12 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 	// Initialization
 	tweetManager := service.NewTweetManager()
 
-	var tweet *domain.Tweet
+	var tweet domain.Tweet
 
 	user := "grupoesfera"
 	text := "This is my first tweet"
 
-	tweet = domain.NewTweet(user, text)
+	tweet = domain.NewTextTweet(user, text)
 
 	// Operation
 	id, _ := tweetManager.PublishTweet(tweet)

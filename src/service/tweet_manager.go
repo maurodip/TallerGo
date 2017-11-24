@@ -16,32 +16,32 @@ type TweetManager struct {
 }
 
 //PublishTweet publish a tweet
-func (tm *TweetManager) PublishTweet(tweet *domain.Tweet) (int, error) {
-	if tweet.User == "" {
+func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
+	if tweet.GetUser() == "" {
 		return 0, fmt.Errorf("user is required")
 	}
-	if tweet.Text == "" {
+	if tweet.GetText() == "" {
 		return 0, fmt.Errorf("text is required")
 	}
-	if len(tweet.Text) > 140 {
+	if len(tweet.GetText()) > 140 {
 		return 0, fmt.Errorf("text exceeds 140 characters")
 	}
 
-	_, ok := tm.Users[tweet.User]
+	_, ok := tm.Users[tweet.GetUser()]
 
 	if !ok {
-		user := domain.NewUser(tweet.User)
-		tm.Users[tweet.User] = user
+		user := domain.NewUser(tweet.GetUser())
+		tm.Users[tweet.GetUser()] = user
 	}
 
-	listOfTweets := tm.Users[tweet.User].Tweets
+	listOfTweets := tm.Users[tweet.GetUser()].Tweets
 	listOfTweets = append(listOfTweets, tweet)
-	tm.Users[tweet.User].Tweets = listOfTweets
+	tm.Users[tweet.GetUser()].Tweets = listOfTweets
 
 	tweet.Id = len(tm.Tweets) + 1
 	tm.Tweets = append(tm.Tweets, tweet)
 
-	trimmedTweet := strings.Fields(tweet.Text)
+	trimmedTweet := strings.Fields(tweet.GetText())
 	for _, value := range trimmedTweet {
 		count, ok := tm.Topics[value]
 		if !ok {
