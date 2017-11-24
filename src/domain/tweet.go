@@ -27,3 +27,7 @@ func (tweet Tweet) Retweet() {
 func (tweet Tweet) Favear() {
 	tweet.Favs++
 }
+
+func (tweet Tweet) PrintableTweet() string {
+	return "@" + tweet.User + ": " + tweet.Text
+}
