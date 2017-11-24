@@ -153,9 +153,7 @@ func (tm TweetManager) GetTimeline(user string) []*domain.Tweet {
 	aUser, ok := tm.Users[user]
 	listOfTweets := make([]*domain.Tweet, 0)
 	if ok {
-		// println("OK")
 		for _, follows := range aUser.Follows {
-			// println(follows)
 			listOfTweets = append(listOfTweets, tm.Users[follows].Tweets...)
 		}
 		listOfTweets = append(listOfTweets, aUser.Tweets...)
@@ -181,4 +179,22 @@ func (tm TweetManager) GetAllDirectMessages(user string) []*domain.Message {
 func (tm TweetManager) ReadDirectMessage(idMsg int) {
 	user := tm.Users[tm.Messages[idMsg]]
 	user.GetMessage(idMsg).ReadMessage()
+}
+
+func (tm TweetManager) Retweetear(idtweet int, user string) {
+	tweet := tm.GetTweetById(idtweet)
+	tweet.Retweet()
+	aUser := tm.Users[user]
+	aUser.Tweets = append(aUser.Tweets, tweet)
+}
+
+func (tm TweetManager) Favear(idtweet int, user string) {
+	tweet := tm.GetTweetById(idtweet)
+	tweet.Favear()
+	aUser := tm.Users[user]
+	aUser.Favs = append(aUser.Favs, tweet)
+}
+
+func (tm TweetManager) GetTweetsFavs(user string) []*domain.Tweet {
+	return tm.Users[user].Favs
 }

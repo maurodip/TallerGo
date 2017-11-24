@@ -352,6 +352,10 @@ func TestUserCanReadMessage(t *testing.T) {
 		t.Errorf("Expected size is 1 but was %d", len(tweetManager.GetUnreadedDirectMessages(anotherUser)))
 		return
 	}
+	if tweetManager.GetUnreadedDirectMessages(anotherUser)[0].Id == 2 {
+		t.Errorf("Expected id is 2 but was %d", tweetManager.GetUnreadedDirectMessages(anotherUser)[0].Id)
+		return
+	}
 
 }
 
@@ -490,6 +494,91 @@ func TestUserCanFollowUsers(t *testing.T) {
 	}
 
 	if !isValidTweet(t, thirdPublishedTweet, thirdId, "grupoesfera", text) {
+		return
+	}
+}
+
+func TestUserCanRetweet(t *testing.T) {
+	tm := service.NewTweetManager()
+	user := "nportas"
+	anotherUser := "mercadolibre"
+	text := "This is my first tweet portas"
+	secondText := "This is my second tweet meli"
+
+	tweet := domain.NewTweet(user, text)
+	anotherTweet := domain.NewTweet(anotherUser, secondText)
+
+	firstId, _ := tm.PublishTweet(tweet)
+	secondId, _ := tm.PublishTweet(anotherTweet)
+
+	tm.Retweetear(firstId, "mercadolibre")
+	timeline := tm.GetTimeline("mercadolibre")
+
+	if len(timeline) != 2 {
+		t.Errorf("Expected size is 2 but was %d", len(timeline))
+		return
+	}
+
+	// devuelve primero los twits de los demas y despues los suyos
+	if timeline[0].Id != secondId {
+		t.Errorf("Expected tweetid is %d but was %d", secondId, timeline[0].Id)
+		return
+	}
+
+	if timeline[1].Id != firstId {
+		t.Errorf("Expected tweetid is %d but was %d", firstId, timeline[1].Id)
+		return
+	}
+}
+
+func TestUserCanRetweetAndFollowUser(t *testing.T) {
+	tm := service.NewTweetManager()
+	user := "nportas"
+	anotherUser := "mercadolibre"
+	text := "This is my first tweet portas"
+	secondText := "This is my second tweet meli"
+
+	tweet := domain.NewTweet(user, text)
+	anotherTweet := domain.NewTweet(anotherUser, secondText)
+
+	firstId, _ := tm.PublishTweet(tweet)
+	tm.PublishTweet(anotherTweet)
+
+	tm.Follow(anotherUser, user)
+	tm.Retweetear(firstId, "mercadolibre")
+
+	timeline := tm.GetTimeline("mercadolibre")
+
+	if len(timeline) != 3 {
+		t.Errorf("Expected size is 3 but was %d", len(timeline))
+		return
+	}
+}
+
+func TestUserCanFav(t *testing.T) {
+	tm := service.NewTweetManager()
+	user := "nportas"
+	anotherUser := "mercadolibre"
+	text := "This is my first tweet portas"
+	secondText := "This is my second tweet meli"
+
+	tweet := domain.NewTweet(user, text)
+	anotherTweet := domain.NewTweet(anotherUser, secondText)
+
+	firstId, _ := tm.PublishTweet(tweet)
+	tm.PublishTweet(anotherTweet)
+
+	tm.Favear(firstId, "mercadolibre")
+	favs := tm.GetTweetsFavs("mercadolibre")
+
+	if len(favs) != 1 {
+		t.Errorf("Expected size is 1 but was %d", len(favs))
+		return
+	}
+
+	// devuelve primero los twits de los demas y despues los suyos
+	if favs[0].Id != firstId {
+		t.Errorf("Expected tweetid is %d but was %d", firstId, favs[0].Id)
 		return
 	}
 }

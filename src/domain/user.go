@@ -5,11 +5,12 @@ type User struct {
 	Follows  []string
 	Tweets   []*Tweet
 	Messages map[int]*Message
+	Favs     []*Tweet
 }
 
 func NewUser(aUser string) *User {
 
-	return &User{User: aUser, Tweets: make([]*Tweet, 0), Messages: make(map[int]*Message)}
+	return &User{User: aUser, Tweets: make([]*Tweet, 0), Messages: make(map[int]*Message), Favs: make([]*Tweet, 0)}
 }
 
 func (user *User) ReceiveDirectMessage(message *Message) {
