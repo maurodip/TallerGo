@@ -360,26 +360,6 @@ func TestUserCanReadMessage(t *testing.T) {
 
 }
 
-func isValidTweet(t *testing.T, tweet domain.Tweet, id int, user, text string) bool {
-
-	if tweet.GetId() != id {
-		t.Errorf("Expected id is %v but was %v", id, tweet.GetId())
-	}
-
-	if tweet.GetUser() != user && tweet.GetText() != text {
-		t.Errorf("Expected tweet is %s: %s \nbut is %s: %s", user, text, tweet.GetUser(), tweet.GetText())
-		return false
-	}
-
-	if tweet.GetDate() == nil {
-		t.Error("Expected date can't be nil")
-		return false
-	}
-
-	return true
-
-}
-
 func TestCannotRetrieveTheTweetsSentByAnUserNotExisting(t *testing.T) {
 
 	// Initialization
@@ -581,4 +561,44 @@ func TestUserCanFav(t *testing.T) {
 		t.Errorf("Expected tweetid is %d but was %d", firstId, favs[0].GetId())
 		return
 	}
+}
+
+func TestShareTweet(t *testing.T) {
+	tm := service.NewTweetManager()
+	var plugin domain.TweetPlugin
+	plugin = domain.NewFacebookPlugin()
+	tm.SetPlugin(plugin)
+
+	user := "nportas"
+	text := "This is my first tweet portas"
+
+	tweet := domain.NewTextTweet(user, text)
+
+	tm.PublishTweet(tweet)
+
+	if len(tm.Plugin) != 1 {
+		t.Errorf("Expected size is 1 but was %d", len(tm.Plugin))
+		return
+	}
+}
+
+//******* Compare Tweets ********
+func isValidTweet(t *testing.T, tweet domain.Tweet, id int, user, text string) bool {
+
+	if tweet.GetId() != id {
+		t.Errorf("Expected id is %v but was %v", id, tweet.GetId())
+	}
+
+	if tweet.GetUser() != user && tweet.GetText() != text {
+		t.Errorf("Expected tweet is %s: %s \nbut is %s: %s", user, text, tweet.GetUser(), tweet.GetText())
+		return false
+	}
+
+	if tweet.GetDate() == nil {
+		t.Error("Expected date can't be nil")
+		return false
+	}
+
+	return true
+
 }

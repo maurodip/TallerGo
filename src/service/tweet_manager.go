@@ -13,6 +13,7 @@ type TweetManager struct {
 	Users    map[string]*domain.User
 	Topics   map[string]int
 	Messages map[int]string
+	Plugin   []domain.TweetPlugin
 }
 
 //PublishTweet publish a tweet
@@ -40,7 +41,7 @@ func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
 
 	tweet.SetId(len(tm.Tweets) + 1)
 	tm.Tweets = append(tm.Tweets, tweet)
-
+	tm.ApplyPlugins(tweet)
 	trimmedTweet := strings.Fields(tweet.GetText())
 	for _, value := range trimmedTweet {
 		count, ok := tm.Topics[value]
@@ -63,12 +64,6 @@ func (tm TweetManager) GetTweet() domain.Tweet {
 
 //GetTweet return the tweet
 func (tm TweetManager) GetTrendingTopics() []string {
-	// var tt1, tt2 string
-	// var
-	// for key, value := range tm.Topics {
-
-	// }
-	// return nil
 	n := map[int][]string{}
 	var a []int
 	for key, count := range tm.Topics {
@@ -102,6 +97,7 @@ func NewTweetManager() *TweetManager {
 		Users:    make(map[string]*domain.User),
 		Topics:   make(map[string]int),
 		Messages: make(map[int]string),
+		Plugin:   make([]domain.TweetPlugin, 0),
 	}
 }
 
@@ -198,4 +194,14 @@ func (tm TweetManager) Favear(idtweet int, user string) {
 
 func (tm TweetManager) GetTweetsFavs(user string) []domain.Tweet {
 	return tm.Users[user].Favs
+}
+
+func (tm *TweetManager) SetPlugin(plugin domain.TweetPlugin) {
+	tm.Plugin = append(tm.Plugin, plugin)
+}
+
+func (tm TweetManager) ApplyPlugins(tweet domain.Tweet) {
+	for _, p := range tm.Plugin {
+		p.Share(tweet)
+	}
 }

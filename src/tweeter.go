@@ -8,6 +8,8 @@ import (
 
 func main() {
 
+	tweetManager := service.NewTweetManager()
+
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
@@ -26,10 +28,10 @@ func main() {
 
 			text := c.ReadLine()
 
-			var tweet *domain.Tweet
-			tweet = domain.NewTweet(user, text)
+			var tweet domain.Tweet
+			tweet = domain.NewTextTweet(user, text)
 
-			err := service.PublishTweet(tweet)
+			_, err := tweetManager.PublishTweet(tweet)
 
 			if err == nil {
 				c.Print("Tweet sent\n")
@@ -46,10 +48,10 @@ func main() {
 		Func: func(c *ishell.Context) {
 			defer c.ShowPrompt(true)
 
-			tweet := service.GetTweet()
+			tweet := tweetManager.GetTweet()
 
 			if tweet != nil {
-				c.Println(tweet.Text)
+				c.Println(tweet)
 			} else {
 				c.Println("Don't have tweet to show")
 			}
@@ -66,7 +68,7 @@ func main() {
 			c.Print("Write User to count: ")
 
 			user := c.ReadLine()
-			count := service.CountTweetsByUser(user)
+			count, _ := tweetManager.CountTweetsByUser(user)
 
 			c.Println(count)
 			return
@@ -79,7 +81,7 @@ func main() {
 		Func: func(c *ishell.Context) {
 			defer c.ShowPrompt(true)
 
-			service.ClearTweet()
+			tweetManager.ClearTweet()
 
 			c.Println("Tweet has been deleted")
 			return
