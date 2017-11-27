@@ -3,14 +3,14 @@ package domain
 type User struct {
 	User     string
 	Follows  []string
-	Tweets   []*Tweet
+	Tweets   []Tweet
 	Messages map[int]*Message
-	Favs     []*Tweet
+	Favs     []Tweet
 }
 
 func NewUser(aUser string) *User {
 
-	return &User{User: aUser, Tweets: make([]*Tweet, 0), Messages: make(map[int]*Message), Favs: make([]*Tweet, 0)}
+	return &User{User: aUser, Tweets: make([]Tweet, 0), Messages: make(map[int]*Message), Favs: make([]Tweet, 0)}
 }
 
 func (user *User) ReceiveDirectMessage(message *Message) {

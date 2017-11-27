@@ -48,3 +48,11 @@ func (tweet *TextTweet) GetText() string {
 func (tweet *TextTweet) GetId() int {
 	return tweet.Id
 }
+
+func (tweet *TextTweet) SetId(id int) {
+	tweet.Id = id
+}
+
+func (tweet *TextTweet) GetDate() *time.Time {
+	return tweet.Date
+}

@@ -9,7 +9,7 @@ import (
 )
 
 type TweetManager struct {
-	Tweets   []*domain.Tweet
+	Tweets   []domain.Tweet
 	Users    map[string]*domain.User
 	Topics   map[string]int
 	Messages map[int]string
@@ -38,7 +38,7 @@ func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
 	listOfTweets = append(listOfTweets, tweet)
 	tm.Users[tweet.GetUser()].Tweets = listOfTweets
 
-	tweet.Id = len(tm.Tweets) + 1
+	tweet.SetId(len(tm.Tweets) + 1)
 	tm.Tweets = append(tm.Tweets, tweet)
 
 	trimmedTweet := strings.Fields(tweet.GetText())
@@ -50,11 +50,11 @@ func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
 		tm.Topics[value] = count + 1
 	}
 
-	return tweet.Id, nil
+	return tweet.GetId(), nil
 }
 
 //GetTweet return the tweet
-func (tm TweetManager) GetTweet() *domain.Tweet {
+func (tm TweetManager) GetTweet() domain.Tweet {
 	if len(tm.Tweets) != 0 {
 		return tm.Tweets[len(tm.Tweets)-1]
 	}
@@ -92,13 +92,13 @@ func (tm TweetManager) GetTrendingTopics() []string {
 func (tm TweetManager) ClearTweet() {
 	tm.Tweets = tm.Tweets[:0]
 	for _, user := range tm.Users {
-		user.Tweets = make([]*domain.Tweet, 0)
+		user.Tweets = make([]domain.Tweet, 0)
 	}
 }
 
 func NewTweetManager() *TweetManager {
 	return &TweetManager{
-		Tweets:   make([]*domain.Tweet, 0),
+		Tweets:   make([]domain.Tweet, 0),
 		Users:    make(map[string]*domain.User),
 		Topics:   make(map[string]int),
 		Messages: make(map[int]string),
@@ -106,12 +106,12 @@ func NewTweetManager() *TweetManager {
 }
 
 //GetTweets return the tweets
-func (tm TweetManager) GetTweets() []*domain.Tweet {
+func (tm TweetManager) GetTweets() []domain.Tweet {
 	return tm.Tweets
 }
 
 //GetTweetById return the tweet by id
-func (tm TweetManager) GetTweetById(id int) *domain.Tweet {
+func (tm TweetManager) GetTweetById(id int) domain.Tweet {
 	return tm.Tweets[id-1]
 }
 
@@ -123,7 +123,7 @@ func (tm TweetManager) CountTweetsByUser(user string) (int, error) {
 	return len(aUser.Tweets), nil
 }
 
-func (tm TweetManager) GetTweetsByUser(user string) ([]*domain.Tweet, error) {
+func (tm TweetManager) GetTweetsByUser(user string) ([]domain.Tweet, error) {
 	aUser, ok := tm.Users[user]
 	if !ok {
 		return nil, fmt.Errorf("user not exist")
@@ -149,9 +149,9 @@ func (tm TweetManager) Follow(user string, userToFollow string) error {
 	return nil
 }
 
-func (tm TweetManager) GetTimeline(user string) []*domain.Tweet {
+func (tm TweetManager) GetTimeline(user string) []domain.Tweet {
 	aUser, ok := tm.Users[user]
-	listOfTweets := make([]*domain.Tweet, 0)
+	listOfTweets := make([]domain.Tweet, 0)
 	if ok {
 		for _, follows := range aUser.Follows {
 			listOfTweets = append(listOfTweets, tm.Users[follows].Tweets...)
@@ -182,7 +182,8 @@ func (tm TweetManager) ReadDirectMessage(idMsg int) {
 }
 
 func (tm TweetManager) Retweetear(idtweet int, user string) {
-	tweet := tm.GetTweetById(idtweet)
+	var tweet domain.Tweet
+	tweet = tm.GetTweetById(idtweet)
 	tweet.Retweet()
 	aUser := tm.Users[user]
 	aUser.Tweets = append(aUser.Tweets, tweet)
@@ -195,6 +196,6 @@ func (tm TweetManager) Favear(idtweet int, user string) {
 	aUser.Favs = append(aUser.Favs, tweet)
 }
 
-func (tm TweetManager) GetTweetsFavs(user string) []*domain.Tweet {
+func (tm TweetManager) GetTweetsFavs(user string) []domain.Tweet {
 	return tm.Users[user].Favs
 }

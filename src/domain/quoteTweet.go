@@ -49,3 +49,11 @@ func (tweet *QuoteTweet) GetText() string {
 func (tweet *QuoteTweet) GetId() int {
 	return tweet.Id
 }
+
+func (tweet *QuoteTweet) SetId(id int) {
+	tweet.Id = id
+}
+
+func (tweet *QuoteTweet) GetDate() *time.Time {
+	return tweet.Date
+}
