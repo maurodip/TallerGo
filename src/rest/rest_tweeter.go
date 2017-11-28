@@ -29,6 +29,7 @@ func (server *GinServer) StartGinServer() {
 	router.GET("/listTweets", server.listTweets)
 	router.GET("/listTweets/:user", server.getTweetsByUser)
 	router.POST("publishTweet", server.publishTweet)
+	router.GET("/timeline/:user", server.timeline)
 
 	go router.Run()
 }
@@ -61,4 +62,11 @@ func (server *GinServer) publishTweet(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, struct{ Id int }{id})
 	}
+}
+
+func (server *GinServer) timeline(c *gin.Context) {
+
+	user := c.Param("user")
+	tweets := server.tweetManager.GetTimeline(user)
+	c.JSON(http.StatusOK, tweets)
 }

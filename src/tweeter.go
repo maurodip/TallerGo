@@ -116,5 +116,46 @@ func main() {
 			return
 		},
 	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "follow",
+		Help: "Follow a user",
+		Func: func(c *ishell.Context) {
+			defer c.ShowPrompt(true)
+
+			c.Print("Write your user: ")
+
+			user := c.ReadLine()
+
+			c.Print("Write user to follow: ")
+
+			userToFollow := c.ReadLine()
+
+			tweetManager.Follow(user, userToFollow)
+
+			c.Println("Add followed user")
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "timeline",
+		Help: "Get a user timeline",
+		Func: func(c *ishell.Context) {
+			defer c.ShowPrompt(true)
+
+			c.Print("Write your user: ")
+
+			user := c.ReadLine()
+
+			timelineTweets := tweetManager.GetTimeline(user)
+
+			for _, v := range timelineTweets {
+				c.Println(v.PrintableTweet())
+			}
+			return
+		},
+	})
+
 	shell.Run()
 }

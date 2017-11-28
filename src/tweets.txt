@@ -1,2 +1,2 @@
-id:1 @nico: hola mauro
-id:2 @mauro: guuuf
+id:1 @nico: fontela vendehumo
+id:2 @mauro: fonte idolo
