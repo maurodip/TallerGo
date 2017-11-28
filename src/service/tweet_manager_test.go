@@ -633,3 +633,30 @@ func TestCanWriteATweet(t *testing.T) {
 		t.Errorf("A tweet in the writer was expected")
 	}
 }
+
+func TestCanWriteATweetInAFile(t *testing.T) {
+
+	// Initialization
+	tweet := domain.NewTextTweet("grupoesfera", "Async tweet")
+	tweet2 := domain.NewTextTweet("grupoesfera", "Async tweet2")
+
+	fileTweetWriter := service.NewFileTweetWriter()
+	tweetWriter := service.NewChannelTweetWriter(fileTweetWriter)
+
+	tweetsToWrite := make(chan domain.Tweet)
+	quit := make(chan bool)
+
+	go tweetWriter.WriteTweet(tweetsToWrite, quit)
+
+	// Operation
+	tweetsToWrite <- tweet
+	tweetsToWrite <- tweet2
+	close(tweetsToWrite)
+
+	<-quit
+
+	// Validation
+	if false {
+		t.Errorf("A tweet in the writer was expected")
+	}
+}
