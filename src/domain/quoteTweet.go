@@ -31,7 +31,7 @@ func (tweet *QuoteTweet) Favear() {
 }
 
 func (tweet *QuoteTweet) PrintableTweet() string {
-	return fmt.Sprintf(`@%s: %s "@%s: %s"`, tweet.User, tweet.Text, tweet.Quote.User, tweet.Quote.Text)
+	return fmt.Sprintf(`id:%d @%s: %s "@%s: %s"`, tweet.Id, tweet.User, tweet.Text, tweet.Quote.User, tweet.Quote.Text)
 } //`@nick: Awesome "@grupoesfera: This is my tweet"`
 
 func (tweet *QuoteTweet) String() string {

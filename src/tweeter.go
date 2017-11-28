@@ -1,7 +1,10 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/TallerGo/src/domain"
+	"github.com/TallerGo/src/rest"
 	"github.com/TallerGo/src/service"
 	"github.com/abiosoft/ishell"
 )
@@ -11,6 +14,9 @@ func main() {
 	fileTW := service.NewFileTweetWriter()
 	channelTW := service.NewChannelTweetWriter(fileTW)
 	tweetManager := service.NewTweetManager(channelTW)
+
+	ginServer := rest.NewGinServer(tweetManager)
+	ginServer.StartGinServer()
 
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
@@ -86,6 +92,27 @@ func main() {
 			tweetManager.ClearTweet()
 
 			c.Println("Tweet has been deleted")
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "retweetTweet",
+		Help: "Retweet a tweet",
+		Func: func(c *ishell.Context) {
+			defer c.ShowPrompt(true)
+
+			c.Print("Write your user: ")
+
+			user := c.ReadLine()
+
+			c.Print("Write id tweet: ")
+
+			id, _ := strconv.Atoi(c.ReadLine())
+
+			tweetManager.Retweetear(id, user)
+
+			c.Println("Tweet has been retweeted")
 			return
 		},
 	})

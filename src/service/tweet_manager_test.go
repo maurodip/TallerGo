@@ -26,7 +26,6 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 
 	// Validation
 	publishedTweet := tweetManager.GetTweet()
-	println(publishedTweet == nil)
 	isValidTweet(t, publishedTweet, id, user, text)
 }
 
@@ -487,7 +486,6 @@ func TestUserCanFollowUsers(t *testing.T) {
 
 	timeline := tm.GetTimeline("grupoesfera")
 
-	println(timeline)
 	if len(timeline) != 3 {
 		t.Errorf("Error expected is user not exist")
 		return
@@ -710,5 +708,33 @@ func TestCanWriteATweetInAFile(t *testing.T) {
 	// Validation
 	if false {
 		t.Errorf("A tweet in the writer was expected")
+	}
+}
+
+func TestCanClearTweet(t *testing.T) {
+
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
+
+	var tweet domain.Tweet
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTextTweet(user, text)
+
+	quit := make(chan bool)
+	// Operation
+	tweetManager.PublishTweet(tweet, quit)
+
+	// Validation
+	tweetManager.GetTweet()
+
+	tweetManager.ClearTweet()
+	// Validation
+	if len(tweetManager.GetTweets()) != 0 {
+		t.Errorf("Error should be clear tweets")
 	}
 }

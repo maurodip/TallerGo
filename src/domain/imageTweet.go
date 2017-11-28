@@ -31,7 +31,7 @@ func (tweet *ImageTweet) Favear() {
 }
 
 func (tweet *ImageTweet) PrintableTweet() string {
-	return fmt.Sprintf("@%s: %s %s", tweet.User, tweet.Text, tweet.Image)
+	return fmt.Sprintf("id: %d @%s: %s %s", tweet.Id, tweet.User, tweet.Text, tweet.Image)
 }
 
 func (tweet *ImageTweet) String() string {

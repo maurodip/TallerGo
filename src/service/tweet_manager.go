@@ -102,7 +102,7 @@ func (tm TweetManager) GetTrendingTopics() []string {
 }
 
 //ClearTweet clear a tweet
-func (tm TweetManager) ClearTweet() {
+func (tm *TweetManager) ClearTweet() {
 	tm.Tweets = tm.Tweets[:0]
 	for _, user := range tm.Users {
 		user.Tweets = make([]domain.Tweet, 0)

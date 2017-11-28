@@ -1,2 +1,2 @@
-@grupoesfera: Async tweet
-@grupoesfera: Async tweet2
+id:0 @grupoesfera: Async tweet
+id:0 @grupoesfera: Async tweet2

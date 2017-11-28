@@ -30,7 +30,7 @@ func (tweet *TextTweet) Favear() {
 }
 
 func (tweet *TextTweet) PrintableTweet() string {
-	return fmt.Sprintf("@%s: %s", tweet.User, tweet.Text)
+	return fmt.Sprintf("id:%d @%s: %s", tweet.Id, tweet.User, tweet.Text)
 }
 
 func (tweet *TextTweet) String() string {
