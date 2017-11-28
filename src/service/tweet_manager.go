@@ -9,15 +9,27 @@ import (
 )
 
 type TweetManager struct {
-	Tweets   []domain.Tweet
-	Users    map[string]*domain.User
-	Topics   map[string]int
-	Messages map[int]string
-	Plugin   []domain.TweetPlugin
+	TweetWriter *ChannelTweetWriter
+	Tweets      []domain.Tweet
+	Users       map[string]*domain.User
+	Topics      map[string]int
+	Messages    map[int]string
+	Plugin      []domain.TweetPlugin
+}
+
+func NewTweetManager(channelTW *ChannelTweetWriter) *TweetManager {
+	return &TweetManager{
+		TweetWriter: channelTW,
+		Tweets:      make([]domain.Tweet, 0),
+		Users:       make(map[string]*domain.User),
+		Topics:      make(map[string]int),
+		Messages:    make(map[int]string),
+		Plugin:      make([]domain.TweetPlugin, 0),
+	}
 }
 
 //PublishTweet publish a tweet
-func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
+func (tm *TweetManager) PublishTweet(tweet domain.Tweet, quit chan bool) (int, error) {
 	if tweet.GetUser() == "" {
 		return 0, fmt.Errorf("user is required")
 	}
@@ -50,6 +62,12 @@ func (tm *TweetManager) PublishTweet(tweet domain.Tweet) (int, error) {
 		}
 		tm.Topics[value] = count + 1
 	}
+
+	tweetsToWrite := make(chan domain.Tweet)
+	go tm.TweetWriter.WriteTweet(tweetsToWrite, quit)
+
+	tweetsToWrite <- tweet
+	close(tweetsToWrite)
 
 	return tweet.GetId(), nil
 }
@@ -88,16 +106,6 @@ func (tm TweetManager) ClearTweet() {
 	tm.Tweets = tm.Tweets[:0]
 	for _, user := range tm.Users {
 		user.Tweets = make([]domain.Tweet, 0)
-	}
-}
-
-func NewTweetManager() *TweetManager {
-	return &TweetManager{
-		Tweets:   make([]domain.Tweet, 0),
-		Users:    make(map[string]*domain.User),
-		Topics:   make(map[string]int),
-		Messages: make(map[int]string),
-		Plugin:   make([]domain.TweetPlugin, 0),
 	}
 }
 

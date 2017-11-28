@@ -8,7 +8,9 @@ import (
 
 func main() {
 
-	tweetManager := service.NewTweetManager()
+	fileTW := service.NewFileTweetWriter()
+	channelTW := service.NewChannelTweetWriter(fileTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
@@ -30,8 +32,8 @@ func main() {
 
 			var tweet domain.Tweet
 			tweet = domain.NewTextTweet(user, text)
-
-			_, err := tweetManager.PublishTweet(tweet)
+			quit := make(chan bool)
+			_, err := tweetManager.PublishTweet(tweet, quit)
 
 			if err == nil {
 				c.Print("Tweet sent\n")

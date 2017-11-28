@@ -8,9 +8,10 @@ import (
 )
 
 func TestPublishedTweetIsSaved(t *testing.T) {
-
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 
@@ -19,8 +20,9 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 
 	tweet = domain.NewTextTweet(user, text)
 
+	quit := make(chan bool)
 	// Operation
-	id, _ := tweetManager.PublishTweet(tweet)
+	id, _ := tweetManager.PublishTweet(tweet, quit)
 
 	// Validation
 	publishedTweet := tweetManager.GetTweet()
@@ -29,9 +31,10 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 }
 
 func TestTweetWithoutUserIsNotPublished(t *testing.T) {
-
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 
@@ -39,10 +42,11 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 	text := "This is my first tweet"
 
 	tweet = domain.NewTextTweet(user, text)
+	quit := make(chan bool)
 
 	// Operation
 	var err error
-	_, err = tweetManager.PublishTweet(tweet)
+	_, err = tweetManager.PublishTweet(tweet, quit)
 
 	// Validation
 	if err != nil && err.Error() != "user is required" {
@@ -51,9 +55,10 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 }
 
 func TestTweetWithoutTextIsNotPublished(t *testing.T) {
-
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 
@@ -61,10 +66,10 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 	var text string
 
 	tweet = domain.NewTextTweet(user, text)
-
+	quit := make(chan bool)
 	// Operation
 	var err error
-	_, err = tweetManager.PublishTweet(tweet)
+	_, err = tweetManager.PublishTweet(tweet, quit)
 
 	// Validation
 	if err == nil {
@@ -78,9 +83,10 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 }
 
 func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
-
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 
@@ -90,10 +96,10 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 	   with minimal involvement from the Go project. We greatly appreciate these efforts`
 
 	tweet = domain.NewTextTweet(user, text)
-
+	quit := make(chan bool)
 	// Operation
 	var err error
-	_, err = tweetManager.PublishTweet(tweet)
+	_, err = tweetManager.PublishTweet(tweet, quit)
 
 	// Validation
 	if err == nil {
@@ -108,7 +114,9 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet domain.Tweet
 
@@ -118,10 +126,10 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
-
+	quit := make(chan bool)
 	// Operation
-	firstId, _ := tweetManager.PublishTweet(tweet)
-	secondId, _ := tweetManager.PublishTweet(secondTweet)
+	firstId, _ := tweetManager.PublishTweet(tweet, quit)
+	secondId, _ := tweetManager.PublishTweet(secondTweet, quit)
 
 	// Validation
 	publishedTweets := tweetManager.GetTweets()
@@ -148,7 +156,9 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 func TestCanRetrieveTweetById(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 	var id int
@@ -157,9 +167,9 @@ func TestCanRetrieveTweetById(t *testing.T) {
 	text := "This is my first tweet"
 
 	tweet = domain.NewTextTweet(user, text)
-
+	quit := make(chan bool)
 	// Operation
-	id, _ = tweetManager.PublishTweet(tweet)
+	id, _ = tweetManager.PublishTweet(tweet, quit)
 
 	// Validation
 	publishedTweet := tweetManager.GetTweetById(id)
@@ -170,7 +180,9 @@ func TestCanRetrieveTweetById(t *testing.T) {
 func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -182,10 +194,10 @@ func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	tweetManager.PublishTweet(tweet)
-	tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
+	tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	count, _ := tweetManager.CountTweetsByUser(user)
@@ -200,7 +212,9 @@ func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -212,10 +226,10 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	firstId, _ := tweetManager.PublishTweet(tweet)
-	secondId, _ := tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	firstId, _ := tweetManager.PublishTweet(tweet, quit)
+	secondId, _ := tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	tweets, _ := tweetManager.GetTweetsByUser(user)
@@ -244,7 +258,9 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 func TestUserCanSendDirectMessages(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -256,10 +272,10 @@ func TestUserCanSendDirectMessages(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	tweetManager.PublishTweet(tweet)
-	tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
+	tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
@@ -281,7 +297,9 @@ func TestUserCanSendDirectMessages(t *testing.T) {
 func TestUserCanObtainDirectMessages(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -293,10 +311,10 @@ func TestUserCanObtainDirectMessages(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	tweetManager.PublishTweet(tweet)
-	tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
+	tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
@@ -318,7 +336,9 @@ func TestUserCanObtainDirectMessages(t *testing.T) {
 func TestUserCanReadMessage(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -330,10 +350,10 @@ func TestUserCanReadMessage(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	tweetManager.PublishTweet(tweet)
-	tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
+	tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	tweetManager.SendDirectMessage(user, anotherUser, "Hola "+anotherUser)
@@ -363,7 +383,9 @@ func TestUserCanReadMessage(t *testing.T) {
 func TestCannotRetrieveTheTweetsSentByAnUserNotExisting(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 	user := "grupoesfera"
 
 	// Operation
@@ -381,7 +403,9 @@ func TestCannotRetrieveTheTweetsSentByAnUserNotExisting(t *testing.T) {
 func TestCannotCountTheTweetsSentByAnUserNotExist(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet, secondTweet, thirdTweet domain.Tweet
 
@@ -393,10 +417,10 @@ func TestCannotCountTheTweetsSentByAnUserNotExist(t *testing.T) {
 	tweet = domain.NewTextTweet(user, text)
 	secondTweet = domain.NewTextTweet(user, secondText)
 	thirdTweet = domain.NewTextTweet(anotherUser, text)
-
-	tweetManager.PublishTweet(tweet)
-	tweetManager.PublishTweet(secondTweet)
-	tweetManager.PublishTweet(thirdTweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
+	tweetManager.PublishTweet(secondTweet, quit)
+	tweetManager.PublishTweet(thirdTweet, quit)
 
 	// Operation
 	_, err := tweetManager.CountTweetsByUser("montoto")
@@ -412,7 +436,9 @@ func TestCannotCountTheTweetsSentByAnUserNotExist(t *testing.T) {
 func TestCanRetrieveTTs(t *testing.T) {
 
 	// Initialization
-	tweetManager := service.NewTweetManager()
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tweetManager := service.NewTweetManager(channelTW)
 
 	var tweet domain.Tweet
 
@@ -420,7 +446,8 @@ func TestCanRetrieveTTs(t *testing.T) {
 	text := "HOLA HOLA HOLA HOLA Manola Chau Chau"
 	tweet = domain.NewTextTweet(user, text)
 
-	tweetManager.PublishTweet(tweet)
+	quit := make(chan bool)
+	tweetManager.PublishTweet(tweet, quit)
 
 	// Operation
 	tts := tweetManager.GetTrendingTopics()
@@ -435,7 +462,11 @@ func TestCanRetrieveTTs(t *testing.T) {
 }
 
 func TestUserCanFollowUsers(t *testing.T) {
-	tm := service.NewTweetManager()
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tm := service.NewTweetManager(channelTW)
+
 	user := "nportas"
 	anotherUser := "mercadolibre"
 	text := "This is my first tweet portas"
@@ -444,11 +475,12 @@ func TestUserCanFollowUsers(t *testing.T) {
 	tweet := domain.NewTextTweet(user, text)
 	secondTweet := domain.NewTextTweet(anotherUser, secondText)
 
-	firstId, _ := tm.PublishTweet(tweet)
-	secondId, _ := tm.PublishTweet(secondTweet)
+	quit := make(chan bool)
+	firstId, _ := tm.PublishTweet(tweet, quit)
+	secondId, _ := tm.PublishTweet(secondTweet, quit)
 
 	grupoesferaTweet := domain.NewTextTweet("grupoesfera", text)
-	thirdId, _ := tm.PublishTweet(grupoesferaTweet)
+	thirdId, _ := tm.PublishTweet(grupoesferaTweet, quit)
 
 	tm.Follow("grupoesfera", user)
 	tm.Follow("grupoesfera", anotherUser)
@@ -479,7 +511,11 @@ func TestUserCanFollowUsers(t *testing.T) {
 }
 
 func TestUserCanRetweet(t *testing.T) {
-	tm := service.NewTweetManager()
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tm := service.NewTweetManager(channelTW)
+
 	user := "nportas"
 	anotherUser := "mercadolibre"
 	text := "This is my first tweet portas"
@@ -488,8 +524,9 @@ func TestUserCanRetweet(t *testing.T) {
 	tweet := domain.NewTextTweet(user, text)
 	anotherTweet := domain.NewTextTweet(anotherUser, secondText)
 
-	firstId, _ := tm.PublishTweet(tweet)
-	secondId, _ := tm.PublishTweet(anotherTweet)
+	quit := make(chan bool)
+	firstId, _ := tm.PublishTweet(tweet, quit)
+	secondId, _ := tm.PublishTweet(anotherTweet, quit)
 
 	tm.Retweetear(firstId, "mercadolibre")
 	timeline := tm.GetTimeline("mercadolibre")
@@ -512,7 +549,11 @@ func TestUserCanRetweet(t *testing.T) {
 }
 
 func TestUserCanRetweetAndFollowUser(t *testing.T) {
-	tm := service.NewTweetManager()
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tm := service.NewTweetManager(channelTW)
+
 	user := "nportas"
 	anotherUser := "mercadolibre"
 	text := "This is my first tweet portas"
@@ -521,8 +562,9 @@ func TestUserCanRetweetAndFollowUser(t *testing.T) {
 	tweet := domain.NewTextTweet(user, text)
 	anotherTweet := domain.NewTextTweet(anotherUser, secondText)
 
-	firstId, _ := tm.PublishTweet(tweet)
-	tm.PublishTweet(anotherTweet)
+	quit := make(chan bool)
+	firstId, _ := tm.PublishTweet(tweet, quit)
+	tm.PublishTweet(anotherTweet, quit)
 
 	tm.Follow(anotherUser, user)
 	tm.Retweetear(firstId, "mercadolibre")
@@ -536,7 +578,11 @@ func TestUserCanRetweetAndFollowUser(t *testing.T) {
 }
 
 func TestUserCanFav(t *testing.T) {
-	tm := service.NewTweetManager()
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tm := service.NewTweetManager(channelTW)
+
 	user := "nportas"
 	anotherUser := "mercadolibre"
 	text := "This is my first tweet portas"
@@ -545,8 +591,9 @@ func TestUserCanFav(t *testing.T) {
 	tweet := domain.NewTextTweet(user, text)
 	anotherTweet := domain.NewTextTweet(anotherUser, secondText)
 
-	firstId, _ := tm.PublishTweet(tweet)
-	tm.PublishTweet(anotherTweet)
+	quit := make(chan bool)
+	firstId, _ := tm.PublishTweet(tweet, quit)
+	tm.PublishTweet(anotherTweet, quit)
 
 	tm.Favear(firstId, "mercadolibre")
 	favs := tm.GetTweetsFavs("mercadolibre")
@@ -564,7 +611,11 @@ func TestUserCanFav(t *testing.T) {
 }
 
 func TestShareTweet(t *testing.T) {
-	tm := service.NewTweetManager()
+	// Initialization
+	memoryTW := service.NewMemoryTweetWriter()
+	channelTW := service.NewChannelTweetWriter(memoryTW)
+	tm := service.NewTweetManager(channelTW)
+
 	var plugin domain.TweetPlugin
 	plugin = domain.NewFacebookPlugin()
 	tm.SetPlugin(plugin)
@@ -574,7 +625,8 @@ func TestShareTweet(t *testing.T) {
 
 	tweet := domain.NewTextTweet(user, text)
 
-	tm.PublishTweet(tweet)
+	quit := make(chan bool)
+	tm.PublishTweet(tweet, quit)
 
 	if len(tm.Plugin) != 1 {
 		t.Errorf("Expected size is 1 but was %d", len(tm.Plugin))
